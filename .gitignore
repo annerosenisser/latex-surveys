@@ -1,0 +1,8 @@
+# Ignore all LaTex auxiliary files
+.aux
+.bbl
+.blg
+.log
+.out
+.toc
+.synctex.gz

@@ -1,0 +1,278 @@
+\documentclass[a4paper,10pt,BCOR10mm,oneside,headsepline]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{wasysym}% provides \ocircle and \Box
+\usepackage{enumitem}% easy control of topsep and leftmargin for lists
+\usepackage{color}% used for background color
+\usepackage{forloop}% used for \Qrating and \Qlines
+\usepackage{ifthen}% used for \Qitem and \QItem
+\usepackage{typearea}
+\areaset{17cm}{26cm}
+\setlength{\topmargin}{-1cm}
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+\ihead{Example questionnaire created with \LaTeX}
+\ohead{\pagemark}
+\chead{}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Beginning of questionnaire command definitions %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% 2010, 2012 by Sven Hartenstein
+%% mail@svenhartenstein.de
+%% http://www.svenhartenstein.de
+%%
+%% Please be warned that this is NOT a full-featured framework for
+%% creating (all sorts of) questionnaires. Rather, it is a small
+%% collection of LaTeX commands that I found useful when creating a
+%% questionnaire. Feel free to copy and adjust any parts you like.
+%% Most probably, you will want to change the commands, so that they
+%% fit your taste.
+%%
+%% Also note that I am not a LaTeX expert! Things can very likely be
+%% done much more elegant than I was able to. If you have suggestions
+%% about what can be improved please send me an email. I intend to
+%% add good tipps to my website and to name contributers of course.
+%%
+%% 10/2012: Thanks to karathan for the suggestion to put \noindent
+%% before \rule!
+
+%% \Qq = Questionaire question. Oh, this is just too simple. It helps
+%% making it easy to globally change the appearance of questions.
+\newcommand{\Qq}[1]{\textbf{#1}}
+
+%% \QO = Circle or box to be ticked. Used both by direct call and by
+%% \Qrating and \Qlist.
+\newcommand{\QO}{$\Box$}% or: $\ocircle$
+
+%% \Qrating = Automatically create a rating scale with NUM steps, like
+%% this: 0--0--0--0--0.
+\newcounter{qr}
+\newcommand{\Qrating}[1]{\QO\forloop{qr}{1}{\value{qr} < #1}{---\QO}}
+
+%% \Qline = Again, this is very simple. It helps setting the line
+%% thickness globally. Used both by direct call and by \Qlines.
+\newcommand{\Qline}[1]{\noindent\rule{#1}{0.6pt}}
+
+%% \Qlines = Insert NUM lines with width=\linewith. You can change the
+%% \vskip value to adjust the spacing.
+\newcounter{ql}
+\newcommand{\Qlines}[1]{\forloop{ql}{0}{\value{ql}<#1}{\vskip0em\Qline{\linewidth}}}
+
+%% \Qlist = This is an environment very similar to itemize but with
+%% \QO in front of each list item. Useful for classical multiple
+%% choice. Change leftmargin and topsep accourding to your taste.
+\newenvironment{Qlist}{%
+\renewcommand{\labelitemi}{\QO}
+\begin{itemize}[leftmargin=1.5em,topsep=-.5em]
+}{%
+\end{itemize}
+}
+
+%% \Qtab = A "tabulator simulation". The first argument is the
+%% distance from the left margin. The second argument is content which
+%% is indented within the current row.
+\newlength{\qt}
+\newcommand{\Qtab}[2]{
+\setlength{\qt}{\linewidth}
+\addtolength{\qt}{-#1}
+\hfill\parbox[t]{\qt}{\raggedright #2}
+}
+
+%% \Qitem = Item with automatic numbering. The first optional argument
+%% can be used to create sub-items like 2a, 2b, 2c, ... The item
+%% number is increased if the first argument is omitted or equals 'a'.
+%% You will have to adjust this if you prefer a different numbering
+%% scheme. Adjust topsep and leftmargin as needed.
+\newcounter{itemnummer}
+\newcommand{\Qitem}[2][]{% #1 optional, #2 notwendig
+\ifthenelse{\equal{#1}{}}{\stepcounter{itemnummer}}{}
+\ifthenelse{\equal{#1}{a}}{\stepcounter{itemnummer}}{}
+\begin{enumerate}[topsep=2pt,leftmargin=2.8em]
+\item[\textbf{\arabic{itemnummer}#1.}] #2
+\end{enumerate}
+}
+
+%% \QItem = Like \Qitem but with alternating background color. This
+%% might be error prone as I hard-coded some lengths (-5.25pt and
+%% -3pt)! I do not yet understand why I need them.
+\definecolor{bgodd}{rgb}{0.8,0.8,0.8}
+\definecolor{bgeven}{rgb}{0.9,0.9,0.9}
+\newcounter{itemoddeven}
+\newlength{\gb}
+\newcommand{\QItem}[2][]{% #1 optional, #2 notwendig
+\setlength{\gb}{\linewidth}
+\addtolength{\gb}{-5.25pt}
+\ifthenelse{\equal{\value{itemoddeven}}{0}}{%
+\noindent\colorbox{bgeven}{\hskip-3pt\begin{minipage}{\gb}\Qitem[#1]{#2}\end{minipage}}%
+\stepcounter{itemoddeven}%
+}{%
+\noindent\colorbox{bgodd}{\hskip-3pt\begin{minipage}{\gb}\Qitem[#1]{#2}\end{minipage}}%
+\setcounter{itemoddeven}{0}%
+}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of questionnaire command definitions %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{center}
+\textbf{\huge Example questionnaire created with \LaTeX}
+\end{center}\vskip1em
+
+\noindent Welcome to this very important survey with which we
+researchers want to look deep inside of you (be afraid!). Anyway,
+thank you for filling it all out.
+
+\noindent \textit{Please note that no tabular environment is used in
+this example questionnaire. Of course, you could use tabular to
+create more complex layout.}
+
+\section*{About you}
+
+\Qitem{ \Qq{Your name}: \Qline{8cm} }
+
+\Qitem{ \Qq{How old are you?} I am \Qline{1.5cm} years old.}
+
+\Qitem{ \Qq{Are you in a good mood right now?} \hskip0.4cm \QO{}
+absolutely \hskip0.5cm \QO{} not really because: \Qline{3cm} }
+
+\Qitem{ \Qq{Do you like having an option?}
+\begin{Qlist}
+\item Yes, this meets my need for autonomy.
+\item No, I'd rather have someone else decide for me.
+\item Not sure.
+\end{Qlist}
+}
+
+\Qitem{ \Qq{What kind of music do you like best?}
+\begin{Qlist}
+\item Johann Sebastian Bach
+\item Jazz
+\item The Beatles
+\item Other: \Qline{4cm}
+\end{Qlist}
+}
+
+\minisec{Please evaluate the following composers}
+\vskip.5em
+
+\Qitem[a]{ \Qq{Mozart} \Qtab{3cm}{horrible \Qrating{5} fantastic}}
+
+\Qitem[b]{ \Qq{Beethoven} \Qtab{3cm}{horrible \Qrating{5} fantastic}}
+
+\Qitem[c]{ \Qq{Johann S. Bach} \Qtab{3cm}{horrible \Qrating{5}
+fantastic}}
+
+\Qitem[d]{ \Qq{John Lennon}\Qtab{2.5cm}{\parbox[t]{3.3cm}{\raggedleft
+Uh, well, I do not like his music very much}
+\Qrating{7} \parbox[t]{3cm}{Oh, yes, you know, really great
+stuff}}}
+
+\Qitem[e]{ \Qq{Elvis}\Qtab{2.5cm}{\parbox[t]{3.3cm}{\raggedleft Uh,
+well, I do not like his music very much}
+\Qrating{7} \parbox[t]{3cm}{Oh, yes, you know, really great
+stuff}}}
+
+\section*{About this questionnaire}
+
+\Qitem{\Qq{Do you like the style so far?} \Qtab{5.5cm}{\QO{} Yes
+\hskip0.5cm \QO{} No}}
+
+\Qitem{\Qq{Is it really worth the ink?} \Qtab{5.5cm}{\QO{} Guess so.
+\hskip0.5cm \QO{} Probably not. \hskip0.5cm \QO{} Don't know.}}
+
+\Qitem{\Qq{How does this item look different from the previous one?}
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{Oh. Does it?}}\par
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{No clue. I just can't figure it out.
+So sorry.}}\par
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{I guess what you mean is that here
+the different answer options are below each other.}}\par
+}
+
+\Qitem[a]{ \Qq{Please describe your first impression.} \Qlines{2} }
+
+\Qitem[b]{ \Qq{In case you would like some more lines to write, here
+they are:} \Qlines{4} }
+
+\section*{Another feature}
+
+\noindent Now, here is another nice feature: you can automatically
+alter the background color of the items. Here is how it can look like.
+Because we are too lazy to think of new questions we will just ask you
+the same questions again. There is one difference to the above though,
+can you find it?
+
+\renewcommand{\QO}{$\ocircle$}% Use circles now instead of boxes.
+
+\section*{About you}
+
+\QItem{ \Qq{Your name}: \Qline{8cm} }
+
+\QItem{ \Qq{How old are you?} I am \Qline{1.5cm} years old.}
+
+\QItem{ \Qq{Are you in a good mood right now?} \hskip0.4cm \QO{}
+absolutely \hskip0.5cm \QO{} not really because: \Qline{3cm} }
+
+\QItem{ \Qq{Do you like having an option?}
+\begin{Qlist}
+\item Yes, this meets my need for autonomy.
+\item No, I'd rather have someone else decide for me.
+\item Not sure.
+\end{Qlist}
+}
+
+\QItem{ \Qq{What kind of music do you like best?}
+\begin{Qlist}
+\item Johann Sebastian Bach
+\item Jazz
+\item The Beatles
+\item Other: \Qline{4cm}
+\end{Qlist}
+}
+
+\minisec{Please evaluate the following composers}
+\vskip.5em
+
+\QItem[a]{ \Qq{Mozart} \Qtab{3cm}{horrible \Qrating{5} fantastic}}
+
+\QItem[b]{ \Qq{Beethoven} \Qtab{3cm}{horrible \Qrating{5} fantastic}}
+
+\QItem[c]{ \Qq{Johann S. Bach} \Qtab{3cm}{horrible \Qrating{5} fantastic}}
+
+\QItem[d]{ \Qq{John Lennon}\Qtab{2.5cm}{\parbox[t]{3.3cm}{\raggedleft
+Uh, well, I do not like his music very much}
+\Qrating{7} \parbox[t]{3cm}{Oh, yes, you know, really great
+stuff}}}
+
+\QItem[e]{ \Qq{Elvis}\Qtab{2.5cm}{\parbox[t]{3.3cm}{\raggedleft
+Uh, well, I do not like his music very much}
+\Qrating{7} \parbox[t]{3cm}{Oh, yes, you know, really great
+stuff}}}
+
+\section*{About this questionnaire}
+
+\QItem{\Qq{Do you like the style so far?} \Qtab{5.5cm}{\QO{} Yes
+\hskip0.5cm \QO{} No}}
+
+\QItem{\Qq{Is it really worth the ink?} \Qtab{5.5cm}{\QO{} Guess so.
+\hskip0.5cm \QO{} Probably not. \hskip0.5cm \QO{} Don't know.}}
+
+\QItem{\Qq{How does this item look different from the previous one?}
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{Oh. Does it?}}\par
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{No clue. I just can't figure it out.
+So sorry.}}\par
+\Qtab{10.5cm}{\QO{}\Qtab{0.6cm}{I guess what you mean is that here
+the different answer options are below each other.}}\par
+}
+
+\QItem[a]{ \Qq{Please describe your first impression.} \Qlines{2} }
+
+\QItem[b]{ \Qq{In case you would like some more lines to write, here
+they are:} \Qlines{4} }
+
+\end{document}
