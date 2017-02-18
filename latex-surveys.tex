@@ -58,8 +58,14 @@
 
 %% \Qlines = Insert NUM lines with width=\linewith. You can change the
 %% \vskip value to adjust the spacing.
+%\newcounter{ql}
+%\newcommand{\Qlines}[1]{\forloop{ql}{0}{\value{ql}<#1}{\vskip0em\Qline{\linewidth}}}
+
+% added new \Qlines argument with ability to specify line width, use \Qlines[number][width]
+% default width remains \linewidth for compatability
+\usepackage{xparse}
 \newcounter{ql}
-\newcommand{\Qlines}[1]{\forloop{ql}{0}{\value{ql}<#1}{\vskip0em\Qline{\linewidth}}}
+\DeclareDocumentCommand{\Qlines}{o O{\linewidth}}{\forloop{ql}{0}{\value{ql}<#1}{\vskip0em\Qline{#2}}}
 
 %% \Qlist = This is an environment very similar to itemize but with
 %% \QO in front of each list item. Useful for classical multiple
